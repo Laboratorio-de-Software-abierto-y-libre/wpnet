@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>WP‑NET — Terminal Access</title>
+  <title>WP‑NET — Installation Guide</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
@@ -13,6 +13,7 @@
       --grid: #111111;
       --line: #ffffff;
       --border: #e6e6e6;
+      --accent: #00ff9d;
     }
     html, body { height: 100%; }
     body {
@@ -20,7 +21,8 @@
       background: var(--bg);
       color: var(--fg);
       font-family: 'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      overflow: hidden;
+      /* Allow page to scroll */
+      overflow-y: auto;
     }
     /* Canvas behind UI */
     #canvas-container {
@@ -49,7 +51,7 @@
     }
     /* Terminal-style panel */
     .login-card {
-      width: min(420px, 92vw);
+      width: min(840px, 92vw);
       background: #000;
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -78,76 +80,77 @@
       color: var(--muted);
       font-size: 0.95rem;
     }
-    .field {
-      display: grid;
-      gap: 0.4rem;
-      margin-bottom: 0.9rem;
-    }
-    label {
-      font-size: 0.85rem;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
-    input[type="text"], input[type="password"] {
-      background: #000;
-      color: var(--fg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0.7rem 0.9rem;
-      outline: none;
-      transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease;
-    }
-    input[type="text"]::placeholder, input[type="password"]::placeholder {
-      color: #9a9a9a;
-    }
-    input[type="text"]:focus, input[type="password"]:focus {
-      border-color: #fff;
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
-      transform: translateZ(0) scale(1.01);
-    }
-    .actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 0.8rem;
-    }
-    .remember {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    button.login {
-      appearance: none;
-      border: 1px solid var(--border);
-      background: #000;
-      color: var(--fg);
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      padding: 0.75rem 1.1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease, color 140ms ease, background 140ms ease;
-    }
-    button.login:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
-      background: #fff;
-      color: #000;
-    }
+
     .links {
-      display: grid;
-      gap: 0.4rem;
-      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1.2rem;
+      margin: 1rem 0 1.2rem 0;
     }
     .links a {
       color: var(--fg);
       text-decoration: none;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.45rem 0.7rem;
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease, color 140ms ease;
     }
     .links a:hover {
-      text-decoration: underline;
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+    }
+
+    .section {
+      border: 1px dashed rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 1rem;
+      background: rgba(255,255,255,0.02);
+    }
+    .section h2 {
+      margin: 0 0 0.6rem 0;
+      font-size: 1.1rem;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+    }
+    .section h3 {
+      margin: 0.8rem 0 0.4rem 0;
+      font-size: 1rem;
+      color: var(--fg);
+    }
+    .section p {
+      margin: 0.2rem 0 0.8rem 0;
+      color: var(--muted);
+    }
+    .steps {
+      margin: 0.4rem 0 0.6rem 1rem;
+      padding: 0;
+      list-style: decimal;
+    }
+    .steps li {
+      margin: 0.4rem 0;
+    }
+    .inline {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 0.06rem 0.3rem;
+      border-radius: 4px;
+      color: #fff;
+    }
+    pre {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 0.7rem 0.8rem;
+      border-radius: 6px;
+      overflow: auto;
+      margin: 0.5rem 0 0.8rem 0;
+    }
+    code {
+      color: #fff;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
@@ -156,42 +159,107 @@
   <div id="canvas-container" aria-hidden="true"></div>
 
   <main class="form-container">
-    <section class="login-card" role="form" aria-describedby="login-desc">
+    <section class="login-card" role="region" aria-describedby="guide-desc">
       <h1 class="title">
-        WP‑NET Terminal <span class="caret" aria-hidden="true"></span>
+        WP‑NET Installation <span class="caret" aria-hidden="true"></span>
       </h1>
-      <p id="login-desc" class="subtitle">Monochrome network — minimal distraction, maximum focus.</p>
+      <p id="guide-desc" class="subtitle">Follow these steps to install WP‑NET on macOS and Windows.</p>
 
-      <form action="/wp-login.php" method="post">
-        <div class="field">
-          <label for="user_login">Username</label>
-          <input id="user_login" name="log" type="text" autocomplete="username" placeholder="user" required />
-        </div>
-        <div class="field">
-          <label for="user_pass">Password</label>
-          <input id="user_pass" name="pwd" type="password" autocomplete="current-password" placeholder="••••••••" required />
-        </div>
+      <div class="links" aria-label="Quick links">
+        <a href="/wp-admin/install.php">Run Installer</a>
+        <a href="/wp-login.php">Login</a>
+        <a href="/">Home</a>
+        <a href="/index-bw.html">Monochrome Login</a>
+      </div>
 
-        <div class="actions">
-          <label class="remember">
-            <input type="checkbox" name="rememberme" value="forever" />
-            Remember me
-          </label>
-          <button class="login" type="submit">Login</button>
-        </div>
+      <div class="section">
+        <h2>Prerequisites</h2>
+        <p>WP‑NET is a WordPress‑based project. You need:</p>
+        <ul>
+          <li>Web server: Apache or Nginx</li>
+          <li>PHP 8+ with common extensions (mysqli, json, mbstring, curl, xml)</li>
+          <li>MySQL or MariaDB</li>
+          <li>Optional: Git (to clone this repository)</li>
+        </ul>
+      </div>
 
-        <input type="hidden" name="redirect_to" value="/" />
-      </form>
+      <div class="section">
+        <h2>macOS (Homebrew)</h2>
 
-      <div class="links">
-        <a href="/wp-login.php?action=lostpassword">Forgot password?</a>
-        <a href="/wp-login.php?action=register">Create account</a>
+        <h3>1) Install services</h3>
+        <pre><code>brew update
+brew install httpd php mariadb
+brew services start httpd
+brew services start php
+brew services start mariadb</code></pre>
+
+        <h3>2) Place the project in your web root</h3>
+        <p>Clone or copy this repository into your web root (e.g. <span class="inline">/opt/homebrew/var/www/</span> on Apple Silicon or <span class="inline">/usr/local/var/www/</span> on Intel). You can check your Homebrew prefix with <span class="inline">brew --prefix</span>.</p>
+
+        <h3>3) Create a database</h3>
+        <pre><code>mysql -u root -p
+CREATE DATABASE wpnet DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'wpnet'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON wpnet.* TO 'wpnet'@'localhost';
+FLUSH PRIVILEGES;</code></pre>
+
+        <h3>4) Configure virtual host (optional)</h3>
+        <p>Edit Apache’s httpd config or a vhost to point to the project directory. Restart Apache if you change config:</p>
+        <pre><code>brew services restart httpd</code></pre>
+
+        <h3>5) Run the installer</h3>
+        <p>Open <a href="/wp-admin/install.php">/wp-admin/install.php</a> in your browser. Enter your database info:</p>
+        <ul>
+          <li>Database Name: <span class="inline">wpnet</span></li>
+          <li>Username: <span class="inline">wpnet</span></li>
+          <li>Password: <span class="inline">your_password</span></li>
+          <li>Database Host: <span class="inline">localhost</span></li>
+          <li>Table Prefix: <span class="inline">wp_</span> (or customize)</li>
+        </ul>
+        <p>Complete the site setup (title, admin user, password). Then login via <a href="/wp-login.php">/wp-login.php</a>.</p>
+      </div>
+
+      <div class="section">
+        <h2>Windows (XAMPP or WampServer)</h2>
+
+        <h3>1) Install a stack</h3>
+        <p>Install XAMPP or WampServer to get Apache, PHP, and MySQL/MariaDB.</p>
+
+        <h3>2) Place the project</h3>
+        <ul>
+          <li>XAMPP: copy the repository into <span class="inline">C:\xampp\htdocs\wp-net\</span></li>
+          <li>WampServer: copy into <span class="inline">C:\wamp64\www\wp-net\</span></li>
+        </ul>
+        <p>Start Apache and MySQL/MariaDB from your stack’s control panel.</p>
+
+        <h3>3) Create a database</h3>
+        <p>Use phpMyAdmin (usually at <span class="inline">http://localhost/phpmyadmin</span>) or the MySQL client to create a database:</p>
+        <pre><code>CREATE DATABASE wpnet DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;</code></pre>
+
+        <h3>4) Run the installer</h3>
+        <p>Visit <span class="inline">http://localhost/wp-net/wp-admin/install.php</span> and enter your database details. Finish setup, then login at <span class="inline">http://localhost/wp-net/wp-login.php</span>.</p>
+      </div>
+
+      <div class="section">
+        <h2>Troubleshooting</h2>
+        <ul>
+          <li>Database connection error: verify credentials and host in <span class="inline">wp-config.php</span> (created by the installer).</li>
+          <li>Blank page: check PHP version and enable error display in the server or logs.</li>
+          <li>Permissions: ensure the web server can read the project and write to <span class="inline">wp-content</span> for updates/uploads.</li>
+          <li>Port conflicts: if Apache or MySQL won’t start, verify that ports 80/443/3306 aren’t used by other apps.</li>
+        </ul>
+      </div>
+
+      <div class="links" aria-label="Post-install links">
+        <a href="/wp-admin/install.php">Run Installer</a>
+        <a href="/wp-login.php">Login</a>
+        <a href="/">Home</a>
       </div>
     </section>
   </main>
 
   <script>
-    // p5.js instance-mode: monochrome network + subtle grid
+    // p5.js instance-mode: monochrome network + subtle grid (reused from index-bw.html)
     (function () {
       new p5(function (p) {
         let nodes = [];
@@ -220,7 +288,6 @@
               vx: p.random(-0.35, 0.35),
               vy: p.random(-0.35, 0.35),
               r: p.random(1.4, 2.6),
-              // Monochrome intensity variance
               intensity: p.random(210, 255),
               pulsePhase: p.random(p.TWO_PI)
             });
