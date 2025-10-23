@@ -493,3 +493,16 @@ FLUSH PRIVILEGES;</code></pre>
   </script>
 </body>
 </html>
+
+/* Mobile: enable scroll inside card and top-align content */
+@media (max-width: 768px) {
+  .form-container {
+    align-items: start; /* instead of vertical centering */
+    justify-items: center;
+  }
+  .login-card {
+    max-height: calc(100vh - 3.5rem); /* leaves breathing space */
+    overflow: auto;                    /* scroll inside card */
+    -webkit-overflow-scrolling: touch; /* smooth iOS scrolling */
+  }
+}
