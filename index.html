@@ -527,5 +527,99 @@ FLUSH PRIVILEGES;</code></pre>
       });
     })();
   </script>
+
+  <!-- jQuery touch scroll plugin with vanilla fallback -->
+  <script>
+    (function () {
+      function initTouchScroll(element, opts) {
+        const friction = (opts && opts.friction) || 0.95;
+        const step = (opts && opts.step) || 1;
+        let startY = 0;
+        let startScrollTop = 0;
+        let lastY = 0;
+        let lastTime = 0;
+        let velocity = 0;
+        let rafId = null;
+
+        function stopMomentum() {
+          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        }
+        function startMomentum() {
+          stopMomentum();
+          rafId = requestAnimationFrame(function run() {
+            velocity *= friction;
+            if (Math.abs(velocity) < 0.05) { rafId = null; return; }
+            element.scrollTop += velocity;
+            rafId = requestAnimationFrame(run);
+          });
+        }
+
+        element.addEventListener('touchstart', function (e) {
+          stopMomentum();
+          const t = e.touches[0];
+          startY = t.clientY;
+          lastY = startY;
+          startScrollTop = element.scrollTop;
+          lastTime = performance.now();
+        }, { passive: true });
+
+        element.addEventListener('touchmove', function (e) {
+          const t = e.touches[0];
+          const currentY = t.clientY;
+          const dy = (startY - currentY) * step;
+
+          const now = performance.now();
+          const dt = Math.max(now - lastTime, 1);
+          velocity = (lastY - currentY) / dt * 16; // px per frame
+          lastY = currentY;
+          lastTime = now;
+
+          const canScroll = element.scrollHeight > element.clientHeight;
+          if (canScroll) e.preventDefault(); // keep scroll inside card
+          element.scrollTop = startScrollTop + dy;
+        }, { passive: false });
+
+        element.addEventListener('touchend', function () {
+          if (Math.abs(velocity) > 0.5) startMomentum();
+        }, { passive: true });
+
+        element.addEventListener('touchcancel', function () {
+          if (Math.abs(velocity) > 0.5) startMomentum();
+        }, { passive: true });
+      }
+
+      function setCardScrollStyles(card) {
+        card.style.overflowY = 'auto';
+        card.style.webkitOverflowScrolling = 'touch';
+        card.style.touchAction = 'pan-y';
+        card.style.overscrollBehavior = 'contain';
+      }
+
+      if (window.jQuery) {
+        (function ($) {
+          $.fn.touchScroll = function (opts) {
+            return this.each(function () {
+              initTouchScroll(this, opts);
+            });
+          };
+          $(function () {
+            const $card = $('.login-card');
+            if ($card.length) {
+              setCardScrollStyles($card[0]);
+              $card.touchScroll({ friction: 0.95, step: 1 });
+            }
+          });
+        })(jQuery);
+      } else {
+        document.addEventListener('DOMContentLoaded', function () {
+          const card = document.querySelector('.login-card');
+          if (card) {
+            setCardScrollStyles(card);
+            initTouchScroll(card, { friction: 0.95, step: 1 });
+          }
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
