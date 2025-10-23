@@ -63,14 +63,14 @@
     .form-container {
       position: relative;
       z-index: 2;
-      min-height: 100vh;
+      min-height: 100dvh; /* was 100vh, use dynamic viewport on mobile */
       display: grid;
       place-items: center;
       padding: 2rem;
     }
     .login-card {
       width: min(840px, 92vw);
-      background: #000;
+      background: rgba(0, 0, 0, 0.7); /* 30% transparency (70% opacity) */
       border: 1px solid var(--border);
       border-radius: 6px;
       box-shadow: 0 0 0 2px rgba(255,255,255,0.05), 0 0 18px rgba(255,255,255,0.08);
@@ -237,12 +237,23 @@
       <p id="guide-desc" class="subtitle">Follow these steps to install WP‑NET on macOS and Windows.</p>
 
       <!-- Sections menu -->
-      <div class="section-menu d-flex flex-column flex-sm-row gap-2" aria-label="Sections">
-                <button type="button" class="btn btn-outline-light w-100 w-sm-auto" data-target="section-wpnet">WP‑NET</button>
-        <button type="button" class="btn btn-light w-100 w-sm-auto" data-target="section-prereq">Prerequisites</button>
-        <button type="button" class="btn btn-outline-light w-100 w-sm-auto" data-target="section-macos">macOS</button>
-        <button type="button" class="btn btn-outline-light w-100 w-sm-auto" data-target="section-windows">Windows</button>
-        <button type="button" class="btn btn-outline-light w-100 w-sm-auto" data-target="section-troubleshooting">Troubleshooting</button>
+      <div class="section-menu" aria-label="Sections">
+        <select class="form-select form-select-sm d-block d-sm-none" aria-label="Sections (mobile)"
+                onchange="(function(sel){var v=sel.value;var btn=document.querySelector('.section-menu button[data-target=&quot;'+v+'&quot;]'); if(btn){btn.click();}})(this)">
+          <option value="section-wpnet">WP‑NET</option>
+          <option value="section-prereq">Prerequisites</option>
+          <option value="section-macos">macOS</option>
+          <option value="section-windows">Windows</option>
+          <option value="section-troubleshooting">Troubleshooting</option>
+        </select>
+
+        <div class="d-none d-sm-flex flex-row gap-2">
+          <button type="button" class="btn btn-outline-light w-sm-auto" data-target="section-wpnet">WP‑NET</button>
+          <button type="button" class="btn btn-light w-sm-auto" data-target="section-prereq">Prerequisites</button>
+          <button type="button" class="btn btn-outline-light w-sm-auto" data-target="section-macos">macOS</button>
+          <button type="button" class="btn btn-outline-light w-sm-auto" data-target="section-windows">Windows</button>
+          <button type="button" class="btn btn-outline-light w-sm-auto" data-target="section-troubleshooting">Troubleshooting</button>
+        </div>
       </div>
       <!-- Prerequisites -->
       <div class="section" id="section-prereq">
@@ -335,14 +346,7 @@ FLUSH PRIVILEGES;</code></pre>
           <li>Port conflicts: if Apache or MySQL won’t start, verify that ports 80/443/3306 aren’t used by other apps.</li>
         </ul>
       </div>
-      <div class="footer-inner">
-      <div class="brand">WP‑NET</div>
-      <div class="footer-links row row-cols-2 row-cols-sm-auto g-2" aria-label="Quick links">
-        <div class="col"><a class="btn btn-outline-light w-100" href="/wp-admin/install.php">Run Installer</a></div>
-        <div class="col"><a class="btn btn-outline-light w-100" href="/wp-login.php">Login</a></div>
-        <div class="col"><a class="btn btn-outline-light w-100" href="/">Home</a></div>
-        <div class="col"><a class="btn btn-outline-light w-100" href="/index-bw.html">Monochrome Login</a></div>
-      </div>
+    
       <div class="footer-links" aria-label="Project link">
         <a class="btn btn-outline-light btn-lg w-100" href="https://github.com/tequitl/wp-net-base" target="_blank" rel="noopener noreferrer">
           <i class="bi bi-github" aria-hidden="true"></i>
